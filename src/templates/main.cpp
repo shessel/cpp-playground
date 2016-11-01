@@ -1,14 +1,14 @@
 #include <iostream>
 
 template <typename T>
-void typesafe_print_variadic(const char * fmt, T next) {
+void typesafe_print_variadic(T next) {
     std::cout << next << std::endl;
 }
 
 template <typename T, typename... Args>
-void typesafe_print_variadic(const char * fmt, T next, Args... args) {
+void typesafe_print_variadic(T next, Args... args) {
     std::cout << next << std::endl;
-    typesafe_print_variadic(fmt, args...);
+    typesafe_print_variadic(args...);
 }
 
 template <typename... Ts>
