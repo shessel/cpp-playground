@@ -20,7 +20,7 @@ struct tuple<T, Ts...> : public tuple<Ts...> {
     T value;
 };
 
-template <size_t k, typename>
+template <size_t n, typename>
 struct element_holder {};
 
 template <typename T, typename... Ts>
@@ -33,9 +33,20 @@ struct element_holder<n, tuple<T, Ts...>> {
     using type = typename element_holder<n-1, tuple<Ts...>>::type;
 };
 
+template <size_t n, typename... Ts>
+std::enable_if_t<n == 0, typename element_holder<0, tuple<Ts...>>::type&> get(tuple<Ts...>& tup) {
+    return tup.value;
+}
+
+template <size_t n, typename T, typename... Ts>
+std::enable_if_t<n != 0, typename element_holder<n, tuple<T, Ts...>>::type&> get(tuple<T, Ts...>& tup) {
+    tuple<Ts...>& base = tup;
+    return get<n-1>(base);
+}
+
 int main() {
     typesafe_print_variadic("1", 1.23f, 1337u, 'a');
     tuple<int, float, char> tup{1337, 0.42f, 'f'};
-    std::cout << tup.value << std::endl;
+    std::cout << get<2>(tup) << std::endl;
     return 0;
 }
