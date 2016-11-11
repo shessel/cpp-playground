@@ -36,10 +36,12 @@ vec4f dot4(const std::array<vec4f,4>& a, const std::array<vec4f, 4>& b) {
     return dp;
 }
 
-int main() {
+void testDot() {
     std::cout << "dot: " << dot(vec4f{1.0f, 1.0f, 0.0f, 0.0f}, vec4f{1.0f, 1.0f, 0.0f, 0.0f}) << std::endl;
     std::cout << "dot: " << dot(vec4f{2.0f, 3.0f, 0.0f, 0.0f}, vec4f{5.0f, 5.0f, 0.0f, 0.0f}) << std::endl;
+}
 
+void testDot4() {
     std::array<vec4f, 4> dotInA{{
         vec4f{1.0f, 1.0f, 1.0f, 1.0f},
         vec4f{1.0f, 1.0f, 1.0f, 1.0f},
@@ -59,7 +61,9 @@ int main() {
         std::cout << val << " ";
     }
     std::cout << std::endl;
+}
 
+void testSetLoadMulAdd() {
     __m256d v1 = _mm256_set_pd(1.0, 2.0, 3.0, 4.0);
     __m256d v2 = _mm256_set_pd(2.0, 3.0, 4.0, 5.0);
 
@@ -72,11 +76,17 @@ int main() {
     res.data.raw = _mm256_add_pd(res.data.raw, v3);
     res.data.raw = _mm256_add_pd(res.data.raw, v4);
 
-    std::cout << "mul_pd, add_pd, add_pd: ";
+    std::cout << "SetLoadMulAdd: ";
     for (double val : res.data.val) {
         std::cout << val << " ";
     }
     std::cout << std::endl;
+}
+
+int main() {
+    testDot();
+    testDot4();
+    testSetLoadMulAdd();
 
     return 0;
 }
