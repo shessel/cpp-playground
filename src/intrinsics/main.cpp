@@ -1,3 +1,4 @@
+#include <array>
 #include <iostream>
 #include "immintrin.h"
 #include "smmintrin.h"
@@ -27,9 +28,37 @@ float dot(const vec4f& a, const vec4f& b) {
     return _mm_cvtss_f32(dp);
 }
 
+vec4f dot4(const std::array<vec4f,4>& a, const std::array<vec4f, 4>& b) {
+    __m128 dp = _mm_or_ps(_mm_dp_ps(a[0].data.raw, b[0].data.raw, 0xF1),
+                _mm_or_ps(_mm_dp_ps(a[1].data.raw, b[1].data.raw, 0xF2),
+                _mm_or_ps(_mm_dp_ps(a[2].data.raw, b[2].data.raw, 0xF4),
+                          _mm_dp_ps(a[3].data.raw, b[4].data.raw, 0xF8))));
+    return dp;
+}
+
 int main() {
-    std::cout << dot(vec4f{1.0f, 1.0f, 0.0f, 0.0f}, vec4f{1.0f, 1.0f, 0.0f, 0.0f}) << std::endl;
-    std::cout << dot(vec4f{2.0f, 3.0f, 0.0f, 0.0f}, vec4f{5.0f, 5.0f, 0.0f, 0.0f}) << std::endl;
+    std::cout << "dot: " << dot(vec4f{1.0f, 1.0f, 0.0f, 0.0f}, vec4f{1.0f, 1.0f, 0.0f, 0.0f}) << std::endl;
+    std::cout << "dot: " << dot(vec4f{2.0f, 3.0f, 0.0f, 0.0f}, vec4f{5.0f, 5.0f, 0.0f, 0.0f}) << std::endl;
+
+    std::array<vec4f, 4> dotInA{{
+        vec4f{1.0f, 1.0f, 1.0f, 1.0f},
+        vec4f{1.0f, 1.0f, 1.0f, 1.0f},
+        vec4f{1.0f, 1.0f, 1.0f, 1.0f},
+        vec4f{1.0f, 1.0f, 1.0f, 1.0f}
+    }};
+    std::array<vec4f, 4> dotInB{{
+        vec4f{1.0f, 0.0f, 0.0f, 0.0f},
+        vec4f{1.0f, 1.0f, 0.0f, 0.0f},
+        vec4f{1.0f, 1.0f, 1.0f, 0.0f},
+        vec4f{1.0f, 1.0f, 1.0f, 1.0f}
+    }};
+    vec4f dot4Res{dot4(dotInA, dotInB)};
+
+    std::cout << "dot4: ";
+    for (double val : dot4Res.data.val) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
 
     __m256d v1 = _mm256_set_pd(1.0, 2.0, 3.0, 4.0);
     __m256d v2 = _mm256_set_pd(2.0, 3.0, 4.0, 5.0);
@@ -43,6 +72,7 @@ int main() {
     res.data.raw = _mm256_add_pd(res.data.raw, v3);
     res.data.raw = _mm256_add_pd(res.data.raw, v4);
 
+    std::cout << "mul_pd, add_pd, add_pd: ";
     for (double val : res.data.val) {
         std::cout << val << " ";
     }
