@@ -67,8 +67,8 @@ void testSetLoadMulAdd() {
     __m256d v1 = _mm256_set_pd(1.0, 2.0, 3.0, 4.0);
     __m256d v2 = _mm256_set_pd(2.0, 3.0, 4.0, 5.0);
 
-    double values[4] = {0.0, 1.0, 0.0, 1.0};
-    double values2[4] = {0.0, 1.0, 0.0, 1.0};
+    double values[4] __attribute__((aligned(32))) = {0.0, 1.0, 0.0, 1.0};
+    double values2[4] __attribute__((aligned(32))) = {0.0, 1.0, 0.0, 1.0};
     __m256d v3 = _mm256_load_pd(values);
     __m256d v4 = _mm256_load_pd(values2);
 
