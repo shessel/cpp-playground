@@ -32,7 +32,7 @@ vec4f dot4(const std::array<vec4f,4>& a, const std::array<vec4f, 4>& b) {
     __m128 dp = _mm_or_ps(_mm_dp_ps(a[0].data.raw, b[0].data.raw, 0xF1),
                 _mm_or_ps(_mm_dp_ps(a[1].data.raw, b[1].data.raw, 0xF2),
                 _mm_or_ps(_mm_dp_ps(a[2].data.raw, b[2].data.raw, 0xF4),
-                          _mm_dp_ps(a[3].data.raw, b[4].data.raw, 0xF8))));
+                          _mm_dp_ps(a[3].data.raw, b[3].data.raw, 0xF8))));
     return dp;
 }
 
@@ -90,4 +90,3 @@ int main() {
 
     return 0;
 }
-
