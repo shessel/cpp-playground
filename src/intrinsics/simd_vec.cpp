@@ -23,6 +23,28 @@ struct vec4f {
     vec4f(__m128 raw) : data{raw} {}
 };
 
+std::ostream& operator<<(std::ostream& os, const vec4f& vec) {
+    std::string delimiter = "";
+    os << "(";
+    for (const auto& val : vec.data.val) {
+        os << delimiter << val;
+        delimiter = ", ";
+    }
+    os << ")";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const vec4d& vec) {
+    std::string delimiter = "";
+    os << "(";
+    for (const auto& val : vec.data.val) {
+        os << delimiter << val;
+        delimiter = ", ";
+    }
+    os << ")";
+    return os;
+}
+
 float dot(const vec4f& a, const vec4f& b) {
     __m128 dp = _mm_dp_ps(a.data.raw, b.data.raw, 0xF1);
     return _mm_cvtss_f32(dp);
@@ -56,11 +78,7 @@ void testDot4() {
     }};
     vec4f dot4Res{dot4(dotInA, dotInB)};
 
-    std::cout << "dot4: ";
-    for (double val : dot4Res.data.val) {
-        std::cout << val << " ";
-    }
-    std::cout << std::endl;
+    std::cout << "dot4: " << dot4Res << std::endl;
 }
 
 void testSetLoadMulAdd() {
@@ -76,11 +94,7 @@ void testSetLoadMulAdd() {
     res.data.raw = _mm256_add_pd(res.data.raw, v3);
     res.data.raw = _mm256_add_pd(res.data.raw, v4);
 
-    std::cout << "SetLoadMulAdd: ";
-    for (double val : res.data.val) {
-        std::cout << val << " ";
-    }
-    std::cout << std::endl;
+    std::cout << "SetLoadMulAdd: " << res << std::endl;
 }
 
 int main() {
