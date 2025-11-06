@@ -38,6 +38,6 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(${EXE_NAME} PRIVATE ${CLANG_COMPILE_OPTIONS})
 endif()
 
-target_link_options(${EXE_NAME} PRIVATE /PROFILE)
+#target_link_options(${EXE_NAME} PRIVATE /PROFILE)
 target_link_libraries(${EXE_NAME} benchmark::benchmark)
 target_compile_features(${EXE_NAME} PRIVATE cxx_std_23)
