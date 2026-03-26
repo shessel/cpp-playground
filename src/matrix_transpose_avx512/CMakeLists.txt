@@ -7,7 +7,7 @@ add_executable(${EXE_NAME} main.cpp)
 # adapted from https://arne-mertz.de/2018/07/cmake-properties-options/
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # warning level 4 and all warnings as errors
-    target_compile_options(${EXE_NAME} PRIVATE /W4 /WX /permissive-)
+    target_compile_options(${EXE_NAME} PRIVATE /W4 /WX /permissive- /arch:AVX512)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CLANG_COMPILE_OPTIONS)
     if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
@@ -24,6 +24,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         )
     endif()
         list(APPEND CLANG_COMPILE_OPTIONS 
+            -march=x86-64-v4
             -Wextra
             -Wpedantic
             -Wconversion

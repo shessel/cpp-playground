@@ -7,6 +7,8 @@
 
 #include <benchmark/benchmark.h>
 
+namespace {
+[[maybe_unused]]
 bool is_aligned(const void* ptr, size_t alignment) {
     // alignment is power of 2
     assert((alignment & (alignment - 1)) == 0);
@@ -14,7 +16,7 @@ bool is_aligned(const void* ptr, size_t alignment) {
 }
 
 template <typename T, size_t M, size_t N>
-struct alignas(32) Matrix {
+struct alignas(64) Matrix {
     T values[M][N];
 };
 
@@ -60,6 +62,7 @@ struct float8x8simd {
     }
 };
 
+[[maybe_unused]]
 void transpose_inplace(float8x8simd &matrix) {
 
     // interleave elements 0,1 and 4,5 of two rows eg:
@@ -140,6 +143,7 @@ void transpose_inplace(float8x8simd &matrix) {
     matrix.rows[7] = _mm256_shuffle_f32x4(row_0_1_2_3_shuffle_2323_1313, row_4_5_6_7_shuffle_2323_1313, shuffle_high4);
 }
 
+[[maybe_unused]]
 void transpose_inplace(float8x8& matrix) {
     float8x8simd matrix_simd;
     matrix_simd.load(matrix);
@@ -147,6 +151,7 @@ void transpose_inplace(float8x8& matrix) {
     matrix_simd.store(matrix);
 }
 
+[[maybe_unused]]
 void transpose_inplace(Matrix<float, 8 * 64, 8 * 64>& matrix) {
     // transpose 8x8 submatrices
     for (size_t row = 0; row < 8*(64-1); row += 8) {
@@ -186,6 +191,7 @@ void transpose_inplace(Matrix<float, 8 * 64, 8 * 64>& matrix) {
     }
 }
 
+[[maybe_unused]]
 void transpose_inplace_swap(float8x8& matrix) {
     for (size_t y = 0; y < 7; ++y) {
         for (size_t x = y + 1; x < 8; ++x) {
@@ -195,6 +201,7 @@ void transpose_inplace_swap(float8x8& matrix) {
 }
 
 template <typename T, size_t N>
+[[maybe_unused]]
 void transpose_inplace_swap_square(Matrix<T,N,N>& matrix) {
     for (size_t row = 0; row < N; ++row) {
         for (size_t col = row + 1; col < N; ++col) {
@@ -204,6 +211,7 @@ void transpose_inplace_swap_square(Matrix<T,N,N>& matrix) {
 }
 
 template <typename T, size_t N>
+[[maybe_unused]]
 void transpose_inplace_swap_square_blocked(Matrix<T, N, N>& matrix) {
     const size_t BLOCK_SIZE = 8;
     for (size_t row = 0; row < N; row+=BLOCK_SIZE) {
@@ -225,12 +233,13 @@ void transpose_inplace_swap_square_blocked(Matrix<T, N, N>& matrix) {
     }
 }
 
+[[maybe_unused]]
 float8x8 transpose(const float8x8& matrix) {
     float8x8 transposed = matrix;
     transpose_inplace(transposed);
     return transposed;
 }
-
+/*
 static void BM_TransposeAVX(benchmark::State& state) {
     float8x8 test = {
         0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f,
@@ -262,42 +271,46 @@ static void BM_TransposeSwap(benchmark::State& state) {
         transpose_inplace_swap(test);
 }
 BENCHMARK(BM_TransposeSwap);
-
+*/
+[[maybe_unused]]
 static void VM_TransposeAVXBig(benchmark::State& state) {
     auto big_test = std::make_unique<Matrix<float, 8 * 64, 8 * 64>>();
     for (size_t row = 0; row < 8 * 64; ++row) {
         for (size_t col = 0; col < 8 * 64; ++col) {
-            big_test->values[row][col] = row * 1.0f + col * 0.001f;
+            big_test->values[row][col] = static_cast<float>(row) * 1.0f + static_cast<float>(col) * 0.001f;
         }
     }
     for (auto _ : state)
         transpose_inplace(*big_test);
 }
-BENCHMARK(VM_TransposeAVXBig);
 
+[[maybe_unused]]
 static void VM_TransposeSwapBig(benchmark::State& state) {
     auto big_test = std::make_unique<Matrix<float, 8 * 64, 8 * 64>>();
     for (size_t row = 0; row < 8 * 64; ++row) {
         for (size_t col = 0; col < 8 * 64; ++col) {
-            big_test->values[row][col] = row * 1.0f + col * 0.001f;
+            big_test->values[row][col] = static_cast<float>(row) * 1.0f + static_cast<float>(col) * 0.001f;
         }
     }
     for (auto _ : state)
         transpose_inplace_swap_square(*big_test);
 }
-BENCHMARK(VM_TransposeSwapBig);
 
+[[maybe_unused]]
 static void VM_TransposeSwapBlockedBig(benchmark::State& state) {
     auto big_test = std::make_unique<Matrix<float, 8 * 64, 8 * 64>>();
     for (size_t row = 0; row < 8 * 64; ++row) {
         for (size_t col = 0; col < 8 * 64; ++col) {
-            big_test->values[row][col] = row * 1.0f + col * 0.001f;
+            big_test->values[row][col] = static_cast<float>(row) * 1.0f + static_cast<float>(col) * 0.001f;
         }
     }
     for (auto _ : state)
         transpose_inplace_swap_square_blocked(*big_test);
 }
+}
 BENCHMARK(VM_TransposeSwapBlockedBig);
+BENCHMARK(VM_TransposeSwapBig);
+BENCHMARK(VM_TransposeAVXBig);
 
 
 #if 1
